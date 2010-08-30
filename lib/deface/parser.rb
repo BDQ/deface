@@ -61,11 +61,7 @@ module Deface
       # @param src [String] The source buffer
       # @param code [String] The Ruby statement to add to the buffer
       def add_stmt(src, code)
-        arr = code.scan /^(\s*)/
-        whitespace = arr.flatten.first
-        newline = code.gsub!(/\n/, "")
-        src << whitespace << "<erb-silent>" << code.strip << "</erb-silent>"
-        src << "\n" if newline
+        src << whitespace(code) << "<erb-silent>" << code.strip << "</erb-silent>"
       end
 
       # Concatenates a Ruby expression that's printed to the document
@@ -75,17 +71,20 @@ module Deface
       # @param src [String] The source buffer
       # @param code [String] The Ruby expression to add to the buffer
       def add_expr_literal(src, code)
-        arr = code.scan /^(\s*)/
-        whitespace = arr.flatten.first
-        newline = code.gsub!(/\n/, "")
-        src << whitespace << "<erb-loud>" << code.strip << "</erb-loud>"
-        src << "\n" if newline
+        src << whitespace(code) << "<erb-loud>" << code.strip << "</erb-loud>"
       end
 
       # not supported (yet?)
       def add_expr_debug(src, code)
          raise "Not Supported"
       end
+
+      private
+        def whitespace(code)
+          arr = code.scan /^(\s*)/
+          res = arr.flatten.first
+          res.length==1 ? "" : res
+        end
     end
   end
 end

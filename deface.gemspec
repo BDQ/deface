@@ -29,7 +29,13 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
-  s.summary = %q{ERB view customizer}
+  s.summary = %q{Deface is a library that allows you to customize ERB views in Rails}
+  s.test_files = [
+    "spec/deface/override_spec.rb",
+     "spec/deface/parser_spec.rb",
+     "spec/deface/template_spec.rb",
+     "spec/spec_helper.rb"
+  ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
