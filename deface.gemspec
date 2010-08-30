@@ -12,11 +12,11 @@ Gem::Specification.new do |s|
   s.date = %q{2010-08-30}
   s.email = %q{brian@railsdog.com}
   s.extra_rdoc_files = [
-    "README"
+    "README.markdown"
   ]
   s.files = [
     "MIT-LICENSE",
-     "README",
+     "README.markdown",
      "Rakefile",
      "VERSION",
      "deface.gemspec",
