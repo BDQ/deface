@@ -30,9 +30,7 @@ A new instance of the Deface::Override class is initialized for each customizati
 
 Target
 ------
-* <tt>:file_path</tt> - The relative file path of the template / partial where the override should take effect eg: *"shared/_person"*, *"admin/posts/new"* this will apply to all controller actions that use the specified template.
-
-* <tt>:virtual_path</tt> - The controller and action name where the override should take effect eg: *"controller/action"* or *"posts/index"* will apply to all layouts, templates and partials that are used in the rendering of the specified action.
+* <tt>:virtual_path</tt> - The template / partial / layout where the override should take effect eg: *"shared/_person"*, *"admin/posts/new"* this will apply to all controller actions that use the specified template.
 
 Action
 ------
@@ -54,27 +52,33 @@ Source
 
 Optional
 --------
-* <tt>:name</tt> - Unique name for override so it can be identified and modified later. This needs to be unique within the same `:virtual_path` or `:file_path`
-
+* <tt>:name</tt> - Unique name for override so it can be identified and modified later. This needs to be unique within the same `:virtual_path`
 Examples
 ========
 
 Replaces all instances of _h1_ in the `posts/_form.html.erb` partial with `<h1>New Post</h1>`
 
-    Deface::Override.new(:file_path => "posts/_form", :name => "example-1", :replace => "h1", :text => "<h1>New Post</h1>")
+     Deface::Override.new(:virtual_path => "posts/_form", 
+                          :name => "example-1", 
+                          :replace => "h1", 
+                          :text => "<h1>New Post</h1>")
 
-Inserts `<%= link_to "List Comments", comments_url(post) %>` before all instances of `p` with css class `comment` in any layout / template / partial used when rendering _PostsController#index_ action:
+Inserts `<%= link_to "List Comments", comments_url(post) %>` before all instances of `p` with css class `comment` in `posts/index.html.erb`
 
-    Deface::Override.new(:virtual_path => "posts/index", :name => "example-2", :insert_before => "p.comment", :text => "<%= link_to "List Comments", comments_url(post) %>")
+     Deface::Override.new(:virtual_path => "posts/index", 
+                          :name => "example-2", 
+                          :insert_before => "p.comment",
+                          :text => "<%= link_to "List Comments", comments_url(post) %>")
 
-Inserts the contents of `shared/_comment.html.erb` after all instances of `div` with an id of `comment_21` in any layout / template / partial used when rendering _PostsController#show_ action:
+Inserts the contents of `shared/_comment.html.erb` after all instances of `div` with an id of `comment_21` in `posts/show.html.erb`
 
-    Deface::Override.new(:virtual_path => "posts/show", :name => "example-3", :insert_after => "div#comment_21", :partial => "shared/comment")
+     Deface::Override.new(:virtual_path => "posts/show", 
+                          :name => "example-3",
+                          :insert_after => "div#comment_21", 
+                          :partial => "shared/comment")
 
 Removes any instance of `<%= helper_method %>` in the `posts/new.html.erb" template:
 
-    Deface::Override.new(:file_path => "posts/new", :name => "example-4", :remove => "erb-loud:contains('helper_method')" )
-
-
-
-
+     Deface::Override.new(:virtual_path => "posts/new", 
+                          :name => "example-4", 
+                          :remove => "erb-loud:contains('helper_method')" )

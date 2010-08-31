@@ -4,7 +4,6 @@ module Deface
   describe Override do
     before(:each) do
       @override = Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :replace => "h1", :text => "<h1>Argh!</h1>")
-      @override2 = Deface::Override.new(:file_path => "posts/index", :name => "Posts#index", :replace => "h1", :text => "<h1>Argh!</h1>")
     end
 
     it "should return correct action" do
@@ -22,22 +21,12 @@ module Deface
       Deface::Override.find({:virtual_path => "posts/index"}).size.should == 1
     end
 
-    it "should find by file_path" do
-      Deface::Override.find({:file_path => "/full/path/to/posts/index.html.erb"}).size.should == 1
-    end
-
     describe "#new" do
 
-      it "should increase virtual#size by 1" do
+      it "should increase all#size by 1" do
         expect {
           Deface::Override.new(:virtual_path => "posts/new", :name => "Posts#new", :replace => "h1", :text => "<h1>argh!</h1>")
-        }.to change{Deface::Override.virtual.size}.by(1)
-      end
-
-      it "should increase file#size by 1" do
-        expect {
-          Deface::Override.new(:file_path => "posts/new", :name => "Posts#new", :replace => "h1", :text => "<h1>argh!</h1>")
-        }.to change{Deface::Override.file.size}.by(1)
+        }.to change{Deface::Override.all.size}.by(1)
       end
     end
 
@@ -87,10 +76,10 @@ module Deface
         @replacement = Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :replace => "h1", :text => "<h1>Arrrr!</h1>")
       end
 
-      it "should not increase virtual#size by 1" do
+      it "should not increase all#size by 1" do
         expect {
           Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :replace => "h1", :text => "<h1>Arrrr!</h1>")
-        }.to change{Deface::Override.virtual.size}.by(0)
+        }.to change{Deface::Override.all.size}.by(0)
 
       end
 

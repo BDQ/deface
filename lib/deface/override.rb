@@ -1,10 +1,9 @@
 module Deface
   class Override
-    cattr_accessor :virtual, :file, :actions
+    cattr_accessor :all, :actions
     attr_accessor :args
 
-    @@virtual ||= {}
-    @@file ||= {}
+    @@all ||= {}
     @@actions = [:remove, :replace, :insert_after, :insert_before]
 
     # Initializes new override, you must supply only one Target, Action & Source
@@ -12,13 +11,9 @@ module Deface
     #
     # ==== Target
     #
-    # * <tt>:file_path</tt> - The relative file path of the template / partial where
+    # * <tt>:virtual_path</tt> - The path of the template / partial where
     #   the override should take effect eg: "shared/_person", "admin/posts/new"
     #   this will apply to all controller actions that use the specified template
-    # * <tt>:virtual_path</tt> - The controller and action name where
-    #   the override should take effect eg: "controller/action" or "posts/index"
-    #   will apply to all layouts, templates and partials that are used in the
-    #   rendering of the specified action.
     #
     # ==== Action
     #
@@ -36,22 +31,15 @@ module Deface
     # ==== Optional
     #
     # * <tt>:name</tt> - Unique name for override so it can be identified and modified later.
-    #   This needs to be unique within the same :virtual_path or :file_path
+    #   This needs to be unique within the same :virtual_path
 
     def initialize(args)
       @args = args
 
-      if args.key?(:virtual_path)
-        key = args[:virtual_path].to_sym
+      key = args[:virtual_path].to_sym
 
-        @@virtual[key] ||= {}
-        @@virtual[key][args[:name].to_s.parameterize] = self
-      elsif args.key?(:file_path)
-        key = args[:file_path]
-
-        @@file[key] ||= {}
-        @@file[key][args[:name].to_s.parameterize] = self
-      end
+      @@all[key] ||= {}
+      @@all[key][args[:name].to_s.parameterize] = self
     end
 
     def selector
@@ -75,15 +63,12 @@ module Deface
     end
 
     def self.find(details)
-      return [] unless self.virtual || self.file
+      return [] unless @@all
 
       result = []
 
       virtual_path = details[:virtual_path]
-      result << @@virtual[virtual_path.to_sym].try(:values) if virtual_path
-
-      file_path = details[:file_path]
-      result << @@file.map { |key,overrides| overrides.try(:values) if file_path =~ /#{key}/ } if file_path
+      result << @@all[virtual_path.to_sym].try(:values)
 
       result.flatten.compact
     end

@@ -2,7 +2,7 @@ ActionView::Template.class_eval do
   alias_method :rails_initialize, :initialize
 
   def initialize(source, identifier, handler, details)
-    overrides = Deface::Override.find(details.merge({:file_path => identifier}))
+    overrides = Deface::Override.find(details)
 
     unless overrides.empty?
       doc = Deface::Parser.convert_fragment(source)
