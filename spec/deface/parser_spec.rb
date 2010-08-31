@@ -9,37 +9,37 @@ module Deface
       end
 
       it "should convert <% ... %>" do
-        Deface::Parser.convert_fragment("<% method_name %>").to_s.should == "<erb-silent>method_name</erb-silent>"
+        Deface::Parser.convert_fragment("<% method_name %>").to_s.should == "<code erb-silent> method_name </code>"
       end
 
       it "should convert <%= ... %>" do
-        Deface::Parser.convert_fragment("<%= method_name %>").to_s.should == "<erb-loud>method_name</erb-loud>"
+        Deface::Parser.convert_fragment("<%= method_name %>").to_s.should == "<code erb-loud> method_name </code>"
       end
 
       it "should convert nested <% ... %>" do
-        Deface::Parser.convert_fragment("<p id=\"<% method_name %>\"></p>").to_s.should == "<p id=\"&lt;erb-silent&gt;method_name&lt;/erb-silent&gt;\"></p>"
+        Deface::Parser.convert_fragment("<p id=\"<% method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-silent&gt; method_name &lt;/code&gt;\"></p>"
       end
 
       it "should convert nested <%= ... %>" do
-        Deface::Parser.convert_fragment("<p id=\"<%= method_name %>\"></p>").to_s.should == "<p id=\"&lt;erb-loud&gt;method_name&lt;/erb-loud&gt;\"></p>"
+        Deface::Parser.convert_fragment("<p id=\"<%= method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-loud&gt; method_name &lt;/code&gt;\"></p>"
       end
     end
 
     describe "#undo_erb_markup" do
-      it "should revert <erb-silent>" do
-        Deface::Parser.undo_erb_markup("<erb-silent>method_name</erb-silent>").should == "<% method_name %>"
+      it "should revert <code erb-silent>" do
+        Deface::Parser.undo_erb_markup!("<code erb-silent> method_name </code>").should == "<% method_name %>"
       end
 
-      it "should revert <erb-loud>" do
-        Deface::Parser.undo_erb_markup("<erb-loud>method_name</erb-loud>").should == "<%= method_name %>"
+      it "should revert <code erb-loud>" do
+        Deface::Parser.undo_erb_markup!("<code erb-loud> method_name </code>").should == "<%= method_name %>"
       end
 
-      it "should revert nested <erb-silent>" do
-        Deface::Parser.undo_erb_markup("<tr id=\"&lt;erb-silent&gt;method_name&lt;/erb-silent&gt;\"></tr>").should == "<tr id=\"<% method_name %>\"></tr>"
+      it "should revert nested <code erb-silent>" do
+        Deface::Parser.undo_erb_markup!("<p id=\"&lt;code erb-silent&gt; method_name > 1 &lt;/code&gt;\"></p>").should == "<p id=\"<% method_name > 1 %>\"></p>"
       end
 
-      it "should revert nested <erb-loud>" do
-        Deface::Parser.undo_erb_markup("<tr id=\"&lt;erb-loud&gt;method_name&lt;/erb-loud&gt;\"></tr>").should == "<tr id=\"<%= method_name %>\"></tr>"
+      it "should revert nested <code erb-loud>" do
+        Deface::Parser.undo_erb_markup!("<p id=\"&lt;code erb-loud&gt; method_name < 2 &lt;/code&gt;\"></p>").should == "<p id=\"<%= method_name < 2 %>\"></p>"
       end
 
     end

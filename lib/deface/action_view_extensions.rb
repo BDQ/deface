@@ -26,7 +26,7 @@ ActionView::Template.class_eval do
 
       source = doc.to_s
 
-      Deface::Parser.undo_erb_markup(source)
+      Deface::Parser.undo_erb_markup!(source)
     end
 
     rails_initialize(source, identifier, handler, details)

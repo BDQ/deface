@@ -11,7 +11,7 @@ Deface temporarily converts ERB files into a pseudo HTML markup that can be pars
 
  becomes 
 
-    <erb-loud> some ruby code </erb-loud>
+    <code erb-loud> some ruby code </code>
 
 and 
   
@@ -19,7 +19,7 @@ and
 
   becomes
 
-    <erb-silent> other ruby code </erb-silent>
+    <code erb-silent> other ruby code </code>
 
 Deface overrides have full access to all variables accessible to the view being customized.
 
@@ -53,6 +53,7 @@ Source
 Optional
 --------
 * <tt>:name</tt> - Unique name for override so it can be identified and modified later. This needs to be unique within the same `:virtual_path`
+
 Examples
 ========
 
@@ -81,4 +82,4 @@ Removes any instance of `<%= helper_method %>` in the `posts/new.html.erb" templ
 
      Deface::Override.new(:virtual_path => "posts/new", 
                           :name => "example-4", 
-                          :remove => "erb-loud:contains('helper_method')" )
+                          :remove => "code[erb-loud]:contains('helper_method')" )

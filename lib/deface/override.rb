@@ -59,7 +59,7 @@ module Deface
         @args[:text]
       end
 
-      Deface::Parser::ERB.compile(erb)
+      Deface::Parser.erb_markup!(erb)
     end
 
     def self.find(details)
