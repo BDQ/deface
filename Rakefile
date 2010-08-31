@@ -28,7 +28,9 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "deface"
     gem.summary = "Deface is a library that allows you to customize ERB views in Rails"
+    gem.description = "Deface is a library that allows you to customize ERB views in a Rails application without editing the underlying view."
     gem.email = "brian@railsdog.com"
+    gem.homepage = "http://github.com/BDQ/Deface"
     gem.authors = ["Brian Quinn"]
     gem.files = Dir["*", "{lib}/**/*"]
     gem.add_dependency("nokogiri", "~> 1.4.3")
