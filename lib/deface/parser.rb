@@ -11,6 +11,11 @@ module Deface
                        {"%>"  => "</code>"} ]
 
       replacements.each{ |h| h.each { |replace, with| source.gsub! replace, with } }
+
+      source.scan(/(<code.*?>)((?:(?!<\/code>)[\s\S])*)(<\/code>)/).each do |match|
+        source.gsub!("#{match[0]}#{match[1]}#{match[2]}", "#{match[0]}#{CGI.escapeHTML(match[1])}#{match[2]}")
+      end
+
       source
     end
 
@@ -22,14 +27,17 @@ module Deface
                        {"</code>"           => '%>'},
                        {/(<|&lt;)code erb-silent(&gt;|>)/ => '<%'},
                        {/(<|&lt;)code erb-loud(&gt;|>)/   => '<%='},
-                       {/(<|&lt;)\/code(&gt;|>)/          => '%>'},
-                       {/(?!=<%=?)&gt;(?=.*%>)/           => '>'},
-                       {/(?!=<%=?)&lt;(?=.*%>)/           => '<'}]
+                       {/(<|&lt;)\/code(&gt;|>)/          => '%>'} ]
 
       replacements.each{ |h| h.each { |replace, with| source.gsub! replace, with } }
+
+      #double un-escape as Nokogiri escapes onces as well as erb-markup!
+      source.scan(/(<%.*?)((?:(?!%>)[\s\S])*)(%>)/).each do |match|
+        source.gsub!("#{match[0]}#{match[1]}#{match[2]}", "#{match[0]}#{CGI.unescapeHTML CGI.unescapeHTML(match[1])}#{match[2]}")
+      end
+
       source
     end
-
 
     def self.convert_fragment(source)
       erb_markup!(source)
