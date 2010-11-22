@@ -39,9 +39,14 @@ module Deface
       source
     end
 
-    def self.convert_fragment(source)
+    def self.convert(source)
       erb_markup!(source)
-      Nokogiri::HTML::DocumentFragment.parse(source)
+
+      if source =~ /(<html.*?)((?:(?!>)[\s\S])*)(>)/
+        Nokogiri::HTML::Document.parse(source)
+      else
+        Nokogiri::HTML::DocumentFragment.parse(source)
+      end
     end
 
   end

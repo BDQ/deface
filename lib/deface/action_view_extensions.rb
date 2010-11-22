@@ -5,7 +5,7 @@ ActionView::Template.class_eval do
     overrides = Deface::Override.find(details)
 
     unless overrides.empty?
-      doc = Deface::Parser.convert_fragment(source)
+      doc = Deface::Parser.convert(source)
 
       overrides.each do |override|
         doc.css(override.selector).each do |match|
@@ -14,11 +14,11 @@ ActionView::Template.class_eval do
             when :remove
               ""
             when :replace
-              Deface::Parser.convert_fragment(override.source.clone)
+              Deface::Parser.convert(override.source.clone)
             when :insert_before
-              Deface::Parser.convert_fragment(override.source.clone << match.to_s)
+              Deface::Parser.convert(override.source.clone << match.to_s)
             when :insert_after
-              Deface::Parser.convert_fragment(match.to_s << override.source.clone)
+              Deface::Parser.convert(match.to_s << override.source.clone)
           end
 
         end

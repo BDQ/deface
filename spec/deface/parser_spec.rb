@@ -3,29 +3,50 @@ require 'spec_helper'
 module Deface
   describe Parser do
 
-    describe "#convert_fragment" do
-      it "should parse html" do
-        Deface::Parser.convert_fragment("<h1>Hello</h1>").to_s.should == "<h1>Hello</h1>"
+    describe "#convert" do
+      it "should parse html fragment" do
+        Deface::Parser.convert("<h1>Hello</h1>").should be_an_instance_of(Nokogiri::HTML::DocumentFragment)
+        Deface::Parser.convert("<h1>Hello</h1>").to_s.should == "<h1>Hello</h1>"
+        Deface::Parser.convert("<title>Hello</title>").should be_an_instance_of(Nokogiri::HTML::DocumentFragment)
+        Deface::Parser.convert("<title>Hello</title>").to_s.should == "<title>Hello</title>"
+      end
+
+      it "should parse html document" do
+        parsed = Deface::Parser.convert("<html><head><title>Hello</title></head><body>test</body>")
+        parsed.should be_an_instance_of(Nokogiri::HTML::Document)
+        parsed = parsed.to_s.split("\n")[1..-1]
+        parsed.should == "<html>\n<head><title>Hello</title></head>\n<body>test</body>\n</html>".split("\n") #ignore doctype added by noko
+
+        parsed = Deface::Parser.convert("<html><title>test</title></html>")
+        parsed.should be_an_instance_of(Nokogiri::HTML::Document)
+        parsed = parsed.to_s.split("\n")[1..-1]
+        parsed.should == "<html><head><title>test</title></head></html>".split("\n") #ignore doctype added by noko
+
+
+        parsed = Deface::Parser.convert("<html><p>test</p></html>")
+        parsed.should be_an_instance_of(Nokogiri::HTML::Document)
+        parsed = parsed.to_s.split("\n")[1..-1]
+        parsed.should == "<html><body><p>test</p></body></html>".split("\n") #ignore doctype added by noko
       end
 
       it "should convert <% ... %>" do
-        Deface::Parser.convert_fragment("<% method_name %>").to_s.should == "<code erb-silent> method_name </code>"
+        Deface::Parser.convert("<% method_name %>").to_s.should == "<code erb-silent> method_name </code>"
       end
 
       it "should convert <%= ... %>" do
-        Deface::Parser.convert_fragment("<%= method_name %>").to_s.should == "<code erb-loud> method_name </code>"
+        Deface::Parser.convert("<%= method_name %>").to_s.should == "<code erb-loud> method_name </code>"
       end
 
       it "should convert nested <% ... %>" do
-        Deface::Parser.convert_fragment("<p id=\"<% method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-silent&gt; method_name &lt;/code&gt;\"></p>"
+        Deface::Parser.convert("<p id=\"<% method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-silent&gt; method_name &lt;/code&gt;\"></p>"
       end
 
       it "should convert nested <%= ... %>" do
-        Deface::Parser.convert_fragment("<p id=\"<%= method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-loud&gt; method_name &lt;/code&gt;\"></p>"
+        Deface::Parser.convert("<p id=\"<%= method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-loud&gt; method_name &lt;/code&gt;\"></p>"
       end
 
       it "should escape contents code tags" do
-        Deface::Parser.convert_fragment("<% method_name(:key => 'value') %>").to_s.should == "<code erb-silent> method_name(:key =&gt; 'value') </code>"
+        Deface::Parser.convert("<% method_name(:key => 'value') %>").to_s.should == "<code erb-silent> method_name(:key =&gt; 'value') </code>"
       end
     end
 
