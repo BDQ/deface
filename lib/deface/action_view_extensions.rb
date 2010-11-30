@@ -8,6 +8,8 @@ ActionView::Template.class_eval do
       doc = Deface::Parser.convert(source)
 
       overrides.each do |override|
+        next if override.disabled?
+
         doc.css(override.selector).each do |match|
 
           match.replace case override.action

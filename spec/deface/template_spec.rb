@@ -70,6 +70,17 @@ module ActionView
         end
       end
 
+      describe "with a single disabled override defined" do
+        before(:all) do
+          Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :remove => "p", :text => "<h1>Argh!</h1>", :disabled => true)
+          @template = ActionView::Template.new("<p>test</p><%= raw(text) %>", "/some/path/to/file.erb", ActionView::Template::Handlers::ERB, {:virtual_path=>"posts/index", :format=>:html})
+        end
+
+        it "should return unmodified source" do
+          @template.source.should == "<p>test</p><%= raw(text) %>"
+        end
+      end
+
     end
   end
 end

@@ -32,6 +32,8 @@ module Deface
     #
     # * <tt>:name</tt> - Unique name for override so it can be identified and modified later.
     #   This needs to be unique within the same :virtual_path
+    # * <tt>:disabled</tt> - When set to true the override will not be applied.
+
 
     def initialize(args)
       @args = args
@@ -62,8 +64,12 @@ module Deface
       Deface::Parser.erb_markup!(erb)
     end
 
+    def disabled?
+      @args.key?(:disabled) ? @args[:disabled] : false
+    end
+
     def self.find(details)
-      return [] unless @@all
+      return [] unless @@all.present?
 
       result = []
 
