@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'erubis'
+require 'cgi'
 
 module Deface
   class Parser

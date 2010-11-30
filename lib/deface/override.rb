@@ -1,5 +1,7 @@
 module Deface
   class Override
+    include Deface::TemplateHelper
+
     cattr_accessor :all, :actions
     attr_accessor :args
 
@@ -78,19 +80,6 @@ module Deface
 
       result.flatten.compact
     end
-
-    private
-      def load_template_source(virtual_path, partial)
-        parts = virtual_path.split("/")
-
-        @lookup_context ||= ActionView::LookupContext.new(ActionController::Base.view_paths, {:formats => [:html]})
-
-        if parts.size == 2
-          return @lookup_context.find(parts[1], parts[0], partial).source
-        else
-          return ""
-        end
-      end
 
   end
 
