@@ -17,8 +17,14 @@ module Deface
       @override.selector.should == "h1"
     end
 
-    it "should find by virtual_path" do
-      Deface::Override.find({:virtual_path => "posts/index"}).size.should == 1
+    describe "#find" do
+      it "should find by virtual_path" do
+        Deface::Override.find({:virtual_path => "posts/index"}).size.should == 1
+      end
+
+      it "should return empty array when no details hash passed" do
+        Deface::Override.find({}).should == []
+      end
     end
 
     describe "#new" do

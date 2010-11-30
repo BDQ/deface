@@ -69,7 +69,7 @@ module Deface
     end
 
     def self.find(details)
-      return [] unless @@all.present?
+      return [] if @@all.empty? || details.empty?
 
       result = []
 
