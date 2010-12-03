@@ -70,6 +70,37 @@ module ActionView
         end
       end
 
+      describe "with a single insert_top override defined" do
+        before(:all) do
+          Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :insert_top => "ul", :text => "<li>me first</li>")
+
+          @template = ActionView::Template.new("<ul><li>first</li><li>second</li><li>third</li></ul>",
+                                               "/path/to/file.erb",
+                                               ActionView::Template::Handlers::ERB,
+                                               {:virtual_path=>"posts/index", :format=>:html})
+        end
+
+        it "should return modified source" do
+          @template.source.gsub("\n", "").should == "<ul><li>me first</li><li>first</li><li>second</li><li>third</li></ul>"
+        end
+      end
+
+      describe "with a single insert_bottom override defined" do
+        before(:all) do
+          Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :insert_bottom => "ul", :text => "<li>I'm always last</li>")
+
+          @template = ActionView::Template.new("<ul><li>first</li><li>second</li><li>third</li></ul>",
+                                               "/path/to/file.erb",
+                                               ActionView::Template::Handlers::ERB,
+                                               {:virtual_path=>"posts/index", :format=>:html})
+        end
+
+        it "should return modified source" do
+          @template.source.gsub("\n", "").should == "<ul><li>first</li><li>second</li><li>third</li><li>I'm always last</li></ul>"
+        end
+      end
+
+
       describe "with a single disabled override defined" do
         before(:all) do
           Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :remove => "p", :text => "<h1>Argh!</h1>", :disabled => true)

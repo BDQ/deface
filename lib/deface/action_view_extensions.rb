@@ -11,7 +11,6 @@ ActionView::Template.class_eval do
         next if override.disabled?
 
         doc.css(override.selector).each do |match|
-
           match.replace case override.action
             when :remove
               ""
@@ -21,6 +20,12 @@ ActionView::Template.class_eval do
               Deface::Parser.convert(override.source.clone << match.to_s)
             when :insert_after
               Deface::Parser.convert(match.to_s << override.source.clone)
+            when :insert_top
+              match.children.before(override.source.clone)
+              Deface::Parser.convert(match.to_s)
+            when :insert_bottom
+              match.children.after(override.source.clone)
+              Deface::Parser.convert(match.to_s)
           end
 
         end

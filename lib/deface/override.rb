@@ -6,7 +6,7 @@ module Deface
     attr_accessor :args
 
     @@all ||= {}
-    @@actions = [:remove, :replace, :insert_after, :insert_before]
+    @@actions = [:remove, :replace, :insert_after, :insert_before, :insert_top, :insert_bottom]
 
     # Initializes new override, you must supply only one Target, Action & Source
     # parameter for each override (and any number of Optional parameters).
@@ -23,6 +23,8 @@ module Deface
     # * <tt>:replace</tt> - Replaces all elements that match the supplied selector
     # * <tt>:insert_after</tt> - Inserts after all elements that match the supplied selector
     # * <tt>:insert_before</tt> - Inserts before all elements that match the supplied selector
+    # * <tt>:insert_top</tt> - Inserts inside all elements that match the supplied selector, before all existing child
+    # * <tt>:insert_bottom</tt> - Inserts inside all elements that match the supplied selector, after all existing child
     #
     # ==== Source
     #
@@ -39,6 +41,7 @@ module Deface
 
     def initialize(args)
       @args = args
+      raise(ArgumentError, "Invalid action") if self.action.nil?
 
       key = args[:virtual_path].to_sym
 
