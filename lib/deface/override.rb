@@ -92,7 +92,7 @@ module Deface
         overrides.each do |override|
           next if override.disabled?
 
-          if override.end_selector.nil?
+          if override.end_selector.blank?
             # single css selector
 
             doc.css(override.selector).each do |match|
