@@ -69,10 +69,82 @@ module Deface
       Deface::Parser.erb_markup!(erb)
     end
 
+    def source_element
+      Deface::Parser.convert(source.clone)
+    end
+
     def disabled?
       @args.key?(:disabled) ? @args[:disabled] : false
     end
 
+    def end_selector
+      @args[:closing_selector]
+    end
+
+    # applies all applicable overrides to given source
+    #
+    def self.apply(source, details)
+      overrides = find(details)
+
+      unless overrides.empty?
+        doc = Deface::Parser.convert(source)
+
+        overrides.each do |override|
+          next if override.disabled?
+
+          if override.end_selector.nil?
+            # single css selector
+
+            doc.css(override.selector).each do |match|
+              case override.action
+                when :remove
+                  match.replace ""
+                when :replace
+                  match.replace override.source_element
+                when :insert_before
+                  match.before override.source_element
+                when :insert_after
+                  match.after override.source_element
+                when :insert_top
+                  match.children.before(override.source_element)
+                when :insert_bottom
+                  match.children.after(override.source_element)
+              end
+
+            end
+          else
+            # targeting range of elements as end_selector is present
+            starting    = doc.css(override.selector).first
+            if starting && starting.parent
+              ending = starting.parent.css(override.end_selector).first
+            else
+              ending = doc.css(override.end_selector).first
+            end
+
+            if starting && ending
+              elements = select_range(starting, ending)
+
+              if override.action == :replace
+                starting.before(override.source_element)
+              end
+
+              #now remove all matched elements
+              elements.map &:remove
+            end
+          end
+
+        end
+
+        source = doc.to_s
+
+        Deface::Parser.undo_erb_markup!(source)
+      end
+
+      source
+    end
+
+    # finds all applicable overrides for supplied template
+    #
     def self.find(details)
       return [] if @@all.empty? || details.empty?
 
@@ -83,6 +155,13 @@ module Deface
 
       result.flatten.compact
     end
+
+    private
+      # finds all elements upto closing sibling in nokgiri document
+      #
+      def self.select_range(first, last)
+        first == last ? [first] : [first, *select_range(first.next, last)]
+      end
 
   end
 
