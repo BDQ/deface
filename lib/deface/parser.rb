@@ -26,15 +26,17 @@ module Deface
       replacements = [ {"<code erb-silent>" => '<%'},
                        {"<code erb-loud>"   => '<%='},
                        {"</code>"           => '%>'},
-                       {/(<|&lt;)code erb-silent(&gt;|>)/ => '<%'},
-                       {/(<|&lt;)code erb-loud(&gt;|>)/   => '<%='},
-                       {/(<|&lt;)\/code(&gt;|>)/          => '%>'} ]
+                       {/(<|&lt;)code(\s|%20)erb-silent(&gt;|>)/ => '<%'},
+                       {/(<|&lt;)code(\s|%20)erb-loud(&gt;|>)/   => '<%='},
+                       {/(<|&lt;)\/code(&gt;|>)/                 => '%>'} ]
 
       replacements.each{ |h| h.each { |replace, with| source.gsub! replace, with } }
 
-      #double un-escape as Nokogiri escapes onces as well as erb-markup!
+      #un-escape changes from Nokogiri and erb-markup!
       source.scan(/(<%.*?)((?:(?!%>)[\s\S])*)(%>)/).each do |match|
-        source.gsub!("#{match[0]}#{match[1]}#{match[2]}", "#{match[0]}#{CGI.unescapeHTML CGI.unescapeHTML(match[1])}#{match[2]}")
+        escaped = URI.unescape match[1]
+        escaped = CGI.unescapeHTML CGI.unescapeHTML(escaped)
+        source.gsub!("#{match[0]}#{match[1]}#{match[2]}", "#{match[0]}#{escaped}#{match[2]}")
       end
 
       source

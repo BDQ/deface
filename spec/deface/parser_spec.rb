@@ -41,8 +41,8 @@ module Deface
         Deface::Parser.convert("<p id=\"<% method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-silent&gt; method_name &lt;/code&gt;\"></p>"
       end
 
-      it "should convert nested <%= ... %>" do
-        Deface::Parser.convert("<p id=\"<%= method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-loud&gt; method_name &lt;/code&gt;\"></p>"
+      it "should convert nested <%= ... %> including href attribute" do
+        Deface::Parser.convert(%(<a href="<%= x 'y' + "z" %>">A Link</a>)).to_s.should == "<a href=\"&lt;code%20erb-loud&gt;%20x%20'y'%20+%20%22z%22%20&lt;/code&gt;\">A Link</a>"
       end
 
       it "should escape contents code tags" do
@@ -63,8 +63,17 @@ module Deface
         Deface::Parser.undo_erb_markup!("<p id=\"&lt;code erb-silent&gt; method_name > 1 &lt;/code&gt;\"></p>").should == "<p id=\"<% method_name > 1 %>\"></p>"
       end
 
+      it "should revert nested <code erb-silent> including href attribute" do
+        Deface::Parser.undo_erb_markup!("<a href=\"&lt;code%20erb-silent&gt;%20method_name%20&lt;/code&gt;\">A Link</a>").should == "<a href=\"<% method_name %>\">A Link</a>"
+      end
+
       it "should revert nested <code erb-loud>" do
         Deface::Parser.undo_erb_markup!("<p id=\"&lt;code erb-loud&gt; method_name < 2 &lt;/code&gt;\"></p>").should == "<p id=\"<%= method_name < 2 %>\"></p>"
+      end
+
+      it "should revert nested <code erb-loud> including href attribute" do
+        Deface::Parser.undo_erb_markup!("<a href=\"&lt;code%20erb-loud&gt;%20x%20'y'%20+%20'z'%20&lt;/code&gt;\">A Link</a>").should == %(<a href="<%= x 'y' + 'z' %>">A Link</a>)
+        Deface::Parser.undo_erb_markup!("<a href=\"&lt;code%20erb-loud&gt;%20x%20'y'%20+%20%22z%22%20&lt;/code&gt;\">A Link</a>").should == %(<a href="<%= x 'y' + "z" %>">A Link</a>)
       end
 
       it "should unescape contents of code tags" do
