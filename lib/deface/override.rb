@@ -42,6 +42,7 @@ module Deface
     def initialize(args)
       @args = args
       raise(ArgumentError, "Invalid action") if self.action.nil?
+      raise(ArgumentError, ":virtual_path must be defined") if args[:virtual_path].blank?
 
       key = args[:virtual_path].to_sym
 
@@ -70,7 +71,7 @@ module Deface
     end
 
     def source_element
-      Deface::Parser.convert(source.clone)
+      @converted_source ||= Deface::Parser.convert(source.clone).to_s
     end
 
     def disabled?

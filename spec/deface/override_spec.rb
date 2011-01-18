@@ -77,6 +77,17 @@ module Deface
 
     end
 
+    describe "#source_element" do
+      before(:each) do
+        @override = Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :replace => "h1", :text => "<%= method 'x' & 'y' %>")
+      end
+
+      it "should return memoized escaped source" do
+        @override.source_element
+        @override.source_element.should == "<code erb-loud> method 'x' &amp;amp; 'y' </code>"
+      end
+    end
+
     describe "when redefining an existing virutal_path and name" do
       before(:each) do
         @replacement = Deface::Override.new(:virtual_path => "posts/index", :name => "Posts#index", :replace => "h1", :text => "<h1>Arrrr!</h1>")
