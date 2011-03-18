@@ -54,6 +54,10 @@ module Deface
       @args[self.action]
     end
 
+    def name
+      @args[:name]
+    end
+
     def action
       (@@actions & @args.keys).first
     end
@@ -87,6 +91,8 @@ module Deface
     def self.apply(source, details)
       overrides = find(details)
 
+      Rails.logger.info "\e[1;32mDeface:\e[0m #{overrides.size} overrides found for #{details[:virtual_path]}"
+
       unless overrides.empty?
         doc = Deface::Parser.convert(source)
 
@@ -96,7 +102,11 @@ module Deface
           if override.end_selector.blank?
             # single css selector
 
-            doc.css(override.selector).each do |match|
+            matches = doc.css(override.selector)
+
+            Rails.logger.info "\e[1;32mDeface:\e[0m #{override.name} matched #{matches.size} times with #{override.selector}"
+
+            matches.each do |match|
               case override.action
                 when :remove
                   match.replace ""
