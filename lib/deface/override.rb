@@ -41,7 +41,7 @@ module Deface
 
     def initialize(args)
       @args = args
-      @enable_logging = defined?(Rails)
+
       raise(ArgumentError, "Invalid action") if self.action.nil?
       raise(ArgumentError, ":virtual_path must be defined") if args[:virtual_path].blank?
 
@@ -91,8 +91,9 @@ module Deface
     #
     def self.apply(source, details)
       overrides = find(details)
+      @enable_logging ||= (defined?(Rails) == "constant" ? true : false)
 
-      if @enable_logging
+      if @enable_logging && overrides.size > 0
         Rails.logger.info "\e[1;32mDeface:\e[0m #{overrides.size} overrides found for #{details[:virtual_path]}"
       end
 
@@ -100,7 +101,12 @@ module Deface
         doc = Deface::Parser.convert(source)
 
         overrides.each do |override|
-          next if override.disabled?
+          if override.disabled?
+            if @enable_logging
+              Rails.logger.info "\e[1;32mDeface:\e[0m #{override.name} is disabled"
+            end
+            next
+          end
 
           if override.end_selector.blank?
             # single css selector
