@@ -5,39 +5,20 @@
 
 Gem::Specification.new do |s|
   s.name = %q{deface}
-  s.version = "0.2.0"
+  s.version = "0.3.0"
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Quinn"]
-  s.date = %q{2010-08-31}
   s.description = %q{Deface is a library that allows you to customize ERB views in a Rails application without editing the underlying view.}
   s.email = %q{brian@railsdog.com}
   s.extra_rdoc_files = [
     "README.markdown"
   ]
-  s.files = [
-    "MIT-LICENSE",
-     "README.markdown",
-     "Rakefile",
-     "VERSION",
-     "deface.gemspec",
-     "init.rb",
-     "lib/deface.rb",
-     "lib/deface/action_view_extensions.rb",
-     "lib/deface/override.rb",
-     "lib/deface/parser.rb"
-  ]
+  s.files         = `git ls-files`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.homepage = %q{http://github.com/BDQ/Deface}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
   s.summary = %q{Deface is a library that allows you to customize ERB views in Rails}
-  s.test_files = [
-    "spec/deface/override_spec.rb",
-     "spec/deface/parser_spec.rb",
-     "spec/deface/template_spec.rb",
-     "spec/spec_helper.rb"
-  ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
