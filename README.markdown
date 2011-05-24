@@ -3,25 +3,12 @@ Deface
 
 Deface is a library that allows you to customize ERB views in a Rails application without editing the underlying view.
 
-It allows you to easily target html & erb elements as the hooks for customization using both CSS and XPath selectors as supported by Nokogiri.
+It allows you to easily target html & erb elements as the hooks for customization using CSS selectors as supported by Nokogiri.
 
-Deface temporarily converts ERB files into a pseudo HTML markup that can be parsed and queired by Nokogiri, using the following approach:
+Demo & Testing
+---------------
+You can play with Deface and see it's parsing in action at [deface.heroku.com](http://deface.heroku.com)
 
-    <%= some ruby code %>
-
- becomes 
-
-    <code erb-loud> some ruby code </code>
-
-and 
-  
-    <% other ruby code %>
-
-  becomes
-
-    <code erb-silent> other ruby code </code>
-
-Deface overrides have full access to all variables accessible to the view being customized.
 
 Deface::Override
 =======
@@ -41,6 +28,10 @@ Action
 * <tt>:insert_after</tt> - Inserts after all elements that match the supplied selector
 
 * <tt>:insert_before</tt> - Inserts before all elements that match the supplied selector
+
+* <tt>:insert_top</tt> - Inserts inside all elements that match the supplied selector, as the first child.
+
+* <tt>:insert_bottom</tt> - Inserts inside all elements that match the supplied selector, as the last child.
 
 Source
 ------
@@ -83,3 +74,45 @@ Removes any instance of `<%= helper_method %>` in the `posts/new.html.erb" templ
      Deface::Override.new(:virtual_path => "posts/new", 
                           :name => "example-4", 
                           :remove => "code[erb-loud]:contains('helper_method')" )
+
+
+Implementation
+==============
+
+Deface temporarily converts ERB files into a pseudo HTML markup that can be parsed and queired by Nokogiri, using the following approach:
+
+    <%= some ruby code %> 
+
+     becomes 
+
+    <code erb-loud> some ruby code </code>
+
+and 
+  
+    <% other ruby code %>
+
+      becomes
+
+    <code erb-silent> other ruby code </code>
+
+ERB that is contained inside a HTML tag definition is converted slightly differently to ensure a valid HTML document that Nokogiri can parse:
+
+    <p id="<%= dom_id @product %>" <%= "style='display:block';" %>>
+   
+      becomes
+
+    <p data-erb-id="&lt;%= dom_id @product %&gt;"  data-erb-0="&lt;%= &quot;style='display:block';&quot; %&gt;">
+
+Deface overrides have full access to all variables accessible to the view being customized.
+
+Caveats
+======
+
+Due to the use of the Nokogiri library for parsing HTML / view files you need to ensure that your layout views include doctype, html, head and body tags in a single file, as Nokogiri will create such elements if it detects any of these tags have been incorrectly nested.
+
+Parsing will fail and result in invalid output if ERB blocks are responsible for closing a HTML tag what was opened normally, i.e. don't do this:
+
+
+      <div <%= ">" %>
+
+
