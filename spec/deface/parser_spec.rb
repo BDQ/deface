@@ -37,12 +37,34 @@ module Deface
         Deface::Parser.convert("<%= method_name %>").to_s.should == "<code erb-loud> method_name </code>"
       end
 
-      it "should convert nested <% ... %>" do
-        Deface::Parser.convert("<p id=\"<% method_name %>\"></p>").to_s.should == "<p id=\"&lt;code erb-silent&gt; method_name &lt;/code&gt;\"></p>"
+      it "should convert first <% ... %> inside html tag" do
+        Deface::Parser.convert("<p <% method_name %>></p>").to_s.should == "<p data-erb-0=\"&lt;% method_name %&gt;\"></p>"
       end
 
-      it "should convert nested <%= ... %> including href attribute" do
-        Deface::Parser.convert(%(<a href="<%= x 'y' + "z" %>">A Link</a>)).to_s.should == "<a href=\"&lt;code%20erb-loud&gt;%20x%20'y'%20+%20%22z%22%20&lt;/code&gt;\">A Link</a>"
+      it "should convert second <% ... %> inside html tag" do
+        Deface::Parser.convert("<p <% method_name %> <% x = y %>></p>").to_s.should == "<p data-erb-0=\"&lt;% method_name %&gt;\" data-erb-1=\"&lt;% x = y %&gt;\"></p>"
+      end
+
+      it "should convert <% ... %> inside double quoted attr value" do
+        Deface::Parser.convert("<p id=\"<% method_name %>\"></p>").to_s.should == "<p data-erb-id=\"&lt;% method_name %&gt;\"></p>"
+      end
+
+      it "should convert <% ... %> inside single quoted attr value" do
+        Deface::Parser.convert("<p id='<% method_name %>'></p>").to_s.should == "<p data-erb-id=\"&lt;% method_name %&gt;\"></p>"
+      end
+
+      it "should convert <% ... %> inside non-quoted attr value" do
+        Deface::Parser.convert("<p id=<% method_name %>></p>").to_s.should == "<p data-erb-id=\"&lt;% method_name %&gt;\"></p>"
+        Deface::Parser.convert("<p id=<% method_name %> alt=\"test\"></p>").to_s.should == "<p data-erb-id=\"&lt;% method_name %&gt;\" alt=\"test\"></p>"
+      end
+
+      it "should convert multiple <% ... %> inside html tag" do
+        Deface::Parser.convert(%q{<p <%= method_name %> alt="<% x = 'y' + 
+                               \"2\" %>" title='<% method_name %>' <%= other_method %></p>}).to_s.should == "<p data-erb-0=\"&lt;%= method_name %&gt;\" data-erb-alt=\"&lt;% x = 'y' + \n                               \\&quot;2\\&quot; %&gt;\" data-erb-title=\"&lt;% method_name %&gt;\" data-erb-1=\"&lt;%= other_method %&gt;\"></p>"
+      end
+
+      it "should convert <%= ... %> including href attribute" do
+        Deface::Parser.convert(%(<a href="<%= x 'y' + "z" %>">A Link</a>)).to_s.should == "<a data-erb-href=\"&lt;%= x 'y' + &quot;z&quot; %&gt;\">A Link</a>"
       end
 
       it "should escape contents code tags" do
@@ -59,21 +81,16 @@ module Deface
         Deface::Parser.undo_erb_markup!("<code erb-loud> method_name </code>").should == "<%= method_name %>"
       end
 
-      it "should revert nested <code erb-silent>" do
-        Deface::Parser.undo_erb_markup!("<p id=\"&lt;code erb-silent&gt; method_name > 1 &lt;/code&gt;\"></p>").should == "<p id=\"<% method_name > 1 %>\"></p>"
+      it "should revert data-erb-x attrs inside html tag" do
+        Deface::Parser.undo_erb_markup!("<p data-erb-0=\"&lt;% method_name %&gt;\" data-erb-1=\"&lt;% x = y %&gt;\"></p>").should == "<p <% method_name %> <% x = y %>></p>"
       end
 
-      it "should revert nested <code erb-silent> including href attribute" do
-        Deface::Parser.undo_erb_markup!("<a href=\"&lt;code%20erb-silent&gt;%20method_name%20&lt;/code&gt;\">A Link</a>").should == "<a href=\"<% method_name %>\">A Link</a>"
+      it "should revert data-erb-id attr inside html tag" do
+        Deface::Parser.undo_erb_markup!("<p data-erb-id=\"&lt;% method_name &gt; 1 %&gt;\"></p>").should == "<p id=\"<% method_name > 1 %>\"></p>"
       end
 
-      it "should revert nested <code erb-loud>" do
-        Deface::Parser.undo_erb_markup!("<p id=\"&lt;code erb-loud&gt; method_name < 2 &lt;/code&gt;\"></p>").should == "<p id=\"<%= method_name < 2 %>\"></p>"
-      end
-
-      it "should revert nested <code erb-loud> including href attribute" do
-        Deface::Parser.undo_erb_markup!("<a href=\"&lt;code%20erb-loud&gt;%20x%20'y'%20+%20'z'%20&lt;/code&gt;\">A Link</a>").should == %(<a href="<%= x 'y' + 'z' %>">A Link</a>)
-        Deface::Parser.undo_erb_markup!("<a href=\"&lt;code%20erb-loud&gt;%20x%20'y'%20+%20%22z%22%20&lt;/code&gt;\">A Link</a>").should == %(<a href="<%= x 'y' + "z" %>">A Link</a>)
+      it "should revert data-erb-href attr inside html tag" do
+        Deface::Parser.undo_erb_markup!("<a data-erb-href=\"&lt;%= x 'y' + &quot;z&quot; %&gt;\">A Link</a>").should == %(<a href="<%= x 'y' + \"z\" %>">A Link</a>)
       end
 
       it "should unescape contents of code tags" do
