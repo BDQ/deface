@@ -1,5 +1,0 @@
-require 'rubygems'
-require 'rspec'
-require 'action_view'
-require 'action_controller'
-require 'deface'
